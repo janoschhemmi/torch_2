@@ -65,6 +65,14 @@ X.shape, y.shape
 
 splits = get_splits(y, valid_size=.2, stratify=True, random_state=23, shuffle=True)
 batch_tfms = TSStandardize(by_sample=True)
+mv_fcn = TSClassifier(X, y, splits=splits, path='models', arch=FCN, batch_tfms=batch_tfms, metrics=accuracy, cbs=ShowGraph())
+mv_clf.fit_one_cycle(10, 1e-2)
+mv_clf.export("mv_clf.pkl")
+
+mv_clf = load_learner("models/mv_clf.pkl")
+probas, target, preds = mv_clf.get_X_preds(X[splits[0]], y[splits[0]])
+
+
 
 dsets = TSDatasets(X, y, tfms=tfms, splits=splits, inplace=True)
 
