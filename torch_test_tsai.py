@@ -17,7 +17,7 @@ from __future__ import annotations
 from tsai.imports import *
 from tsai.utils import *
 from matplotlib.pyplot import figure
-import torch_funs
+#import torch_funs
 from matplotlib.collections import LineCollection
 
 import matplotlib.dates as mdates
@@ -31,15 +31,16 @@ from fastai.metrics import *
 from fastai.learner import *
 from fastai.basics import *
 
+
 import fastcore
 from fastcore.all import *
 import pandas as pd
 
 ## load disturbance time series
-with open(r'P:\workspace\jan\fire_detection\dl\prepocessed_ref_tables\02_df_x_8_2.csv', 'r') as f:
-    X = np.genfromtxt(f, delimiter=';', dtype=np.float32, skip_header=1).reshape(((1498),5,17))
-with open(r'P:\workspace\jan\fire_detection\dl\prepocessed_ref_tables\02_df_Y_8_2.csv', 'r') as f:
-    y = np.genfromtxt(f, delimiter=';',dtype=np.str, skip_header=1)
+with open(r'P:\workspace\jan\fire_detection\dl\prepocessed_ref_tables\03_df_x_10_400smps.csv', 'r') as f:
+    X = np.genfromtxt(f, delimiter=';', dtype=np.float32, skip_header=1).reshape(((1995),5,21))
+with open(r'P:\workspace\jan\fire_detection\dl\prepocessed_ref_tables\03_df_y_10_400smps.csv', 'r') as f:
+    y = np.genfromtxt(f, delimiter=';',dtype=np.int32, skip_header=1)
 
 ## split data
 splits = get_splits(y, valid_size=.2, stratify=True, random_state=23, shuffle=True)
@@ -69,26 +70,32 @@ class FCNN(Module):
         x = self.convblock3(x)
         x = self.gap(x)
         return self.fc(x)
-
 model = FCNN(dls.vars, dls.c)
+model
+#learn = Learner(dls, model, metrics=accuracy)
+
+model = build_ts_model( ResNetPlus, dls=dls)
 learn = Learner(dls, model, metrics=accuracy)
+
 #learn.save('P:/workspace/jan/fire_detection/dl/models/01_test/03_fcn.pth')
 
 #learn.lr_find()
-learn.fit_one_cycle(30, lr_max=1e-3)
+learn.fit_one_cycle(20, lr_max=1e-3, wd = 0.1)
 #learn.save('P:/workspace/jan/fire_detection/dl/models/01_test/03_fcn_stage1.pth')
 
 #learn.recorder.plot_metrics()
-learn.save_all(path='P:/workspace/jan/fire_detection/dl/models/01_test/04_fcn_stage2_window_17_smps_300_5_classes.pth', dls_fname='dls', model_fname='model', learner_fname='learner')
+#learn.save_all(path='P:/workspace/jan/fire_detection/dl/models/01_test/05_fcn_stage2_window_21_smps_400_5_classes_3.pth', dls_fname='dls', model_fname='model', learner_fname='learner')
+learn.save_all(path='P:/workspace/jan/fire_detection/dl/models/01_test/06_ResNetPlus_window_21_smps_400_5_classes_2.pth', dls_fname='dls', model_fname='model', learner_fname='learner')
 
 ##
 #
-learn = load_learner_all(path='P:/workspace/jan/fire_detection/dl/models/01_test/04_fcn_stage2_window_17_smps_300_5_classes.pth',
+learn = load_learner_all(path='P:/workspace/jan/fire_detection/dl/models/01_test/06_ResNetPlus_window_21_smps_400_5_classes_2.pth',
                          dls_fname='dls', model_fname='model', learner_fname='learner')
 #dls = learn.dls
 
-#learn.dls = dls
-#valid_dl = dls.valid
+learn.dls = dls
+valid_dl = dls.valid
+
 #b = next(iter(valid_dl))
 #b
 
@@ -147,12 +154,35 @@ from sklearn.metrics import confusion_matrix
 #    X_ts = pd.read_csv(f, delimiter=';')
 
 ## load time series
-with open(r'P:\workspace\jan\fire_detection\dl\prepocessed_ref_tables\03_df_x_100000_ts_long.csv', 'r') as f:
-    X_ts = pd.read_csv(f, delimiter=';')
+with open(r'P:\workspace\jan\fire_detection\dl\prepocessed_ref_tables\03_df_x_200000_ts_long.csv', 'r') as f:
+    X_ts = pd.read_csv(f, delimiter=';',
+                       dtype={
+                           'x' :   'int64',
+                           'y' :    'int64',
+                           'id':    'int64',
+                           'date' :  'object',
+                           'sensor':  'object',
+                           'value':    'float32',
+                           'tile':    'object',
+                            'index' :  'object',
+                            'change_process': 'object',
+                             'diff' :  'float64',
+                              'instance': 'float64',
+                            'time_sequence' : 'int64'
+                       }
+                       )
 
+X_ts.dtypes
 ## load learner
-learn = load_learner_all(path='P:/workspace/jan/fire_detection/dl/models/01_test/04_fcn_stage2_window_17_smps_300_5_classes.pth',
+#import pathlib
+#plt = platform.system()
+#if plt == 'Windows': pathlib.PosixPath = pathlib.WindowsPath
+learn = load_learner_all(path='P:/workspace/jan/fire_detection/dl/models/01_test/06_ResNetPlus_window_21_smps_400_5_classes_2.pth',
                          dls_fname='dls', model_fname='model', learner_fname='learner')
+#dls = learn.dls
+
+learn.dls = dls
+valid_dl = dls.valid
 
 ## load references
 with open(r'P:\workspace\jan\fire_detection\disturbance_ref\bb_timesync_reference_with_post3_revisited.csv', 'r') as f:
@@ -162,19 +192,19 @@ with open(r'P:\workspace\jan\fire_detection\disturbance_ref\bb_timesync_referenc
 ids = X_ts['id'].unique()
 
 ## set globals
-window_len=17
+window_len=21
 
-base_path = r'P:\workspace\jan\fire_detection\dl\plots\01_FCN\window_size_17'
-name_base = "_prediction_5_classes_17_window.png"
+base_path = r'P:\workspace\jan\fire_detection\dl\plots\02_ResNetPlus\window_size_21_5_classes'
+name_base = "_prediction_5_classes_21_window_3.png"
 if os.path.exists(base_path):
     print("path exists")
 else:
     os.mkdir(base_path)
 
 ## loop over ids
-for id in ids[1:100]:
+for id in ids[1:30]:
     print(id)
-    id = 3298
+    #id = 361
 
     ## subset df for each id
     #   subset = X_ts[X_ts[:,2] == id,:]
@@ -190,18 +220,21 @@ for id in ids[1:100]:
     index = list(sample.index)
     dates = list(sample.columns)
 
-    sample = sample.dropna(axis = 1, how = 'any').astype('int32')
+    sample = sample.dropna(axis = 1, how = 'any').astype('float32')
     # length of time series
     #n_steps = len(sample.columns)
 
-    ## sliding window
     ## into np
-    sample_np = sample.to_numpy()
+    sample_np = sample.to_numpy(dtype = 'float32')
+
+    #sample_np.dtype
     sample_windowed = np.lib.stride_tricks.sliding_window_view(sample_np, (len(index),window_len ))
     sample_windowed = sample_windowed[0,:,:,:]
-
+    torch.from_numpy(sample_windowed)
+    #sample_windowed.dtype
     ## predict for windows
-    probs, test_targets, test_preds = learn.get_X_preds(sample_windowed)
+    sample_windowed
+    probs, test_targets, test_preds = learn.get_X_preds((sample_windowed))
     probs, test_targets, test_preds
 
     # plot it
