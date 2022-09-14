@@ -34,6 +34,11 @@ class UNet_original(torch.nn.Module):
             kernel_size=1
         )
 
+        self.out = nn.Conv2d(
+            in_channels=,
+            out_channels=classes
+        kernel_size = 1
+
     def forward(self, x):
         """Performs a forward pass through the network
         """
