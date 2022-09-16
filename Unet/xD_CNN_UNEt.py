@@ -1,3 +1,26 @@
+import pandas as pd
+import numpy as np
+from tqdm.auto import tqdm
+
+import torch
+import torch.autograd as autograd
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+from torch.quantization import QuantStub, DeQuantStub
+from torch.utils.data import Dataset, DataLoader
+#import torchvision
+import pytorch_lightning as pl
+
+
+from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
+from pytorch_lightning.loggers import TensorBoardLogger
+from torchmetrics.functional import accuracy
+
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+
 # Create PyTorch Dataset
 class TSDataset(Dataset):
     def __init__(self, sequences):
@@ -102,6 +125,7 @@ class conbr_block(nn.Module):
 
     def forward(self, x):
         x = self.conv1(x)
+
         x = self.bn(x)
         out = self.relu(x)
 

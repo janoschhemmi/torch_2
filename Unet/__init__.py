@@ -1,1 +1,2 @@
-from 1D_CNN_UNET.py import *
+import Unet.xD_CNN_UNEt
+from Unet.xD_CNN_UNEt import *

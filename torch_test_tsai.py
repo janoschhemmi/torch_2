@@ -16,6 +16,8 @@ from tsai.all import *
 from __future__ import annotations
 from tsai.imports import *
 from tsai.utils import *
+from tsai.basics import *
+
 from matplotlib.pyplot import figure
 #import torch_funs
 from matplotlib.collections import LineCollection
@@ -29,7 +31,7 @@ from fastai.vision import *
 from fastai.text import *
 from fastai.metrics import *
 from fastai.learner import *
-from fastai.basics import *
+from fastai.data import  *
 
 
 import fastcore
@@ -74,22 +76,22 @@ model = FCNN(dls.vars, dls.c)
 model
 #learn = Learner(dls, model, metrics=accuracy)
 
-model = build_ts_model( ResNetPlus, dls=dls)
+model = build_ts_model( FCNN, dls=dls)
 learn = Learner(dls, model, metrics=accuracy)
 
-#learn.save('P:/workspace/jan/fire_detection/dl/models/01_test/03_fcn.pth')
+#learn.save('P:/workspace/jan/fire_detection/dl/models_store/01_test/03_fcn.pth')
 
 #learn.lr_find()
 learn.fit_one_cycle(20, lr_max=1e-3, wd = 0.1)
-#learn.save('P:/workspace/jan/fire_detection/dl/models/01_test/03_fcn_stage1.pth')
+#learn.save('P:/workspace/jan/fire_detection/dl/models_store/01_test/03_fcn_stage1.pth')
 
 #learn.recorder.plot_metrics()
-#learn.save_all(path='P:/workspace/jan/fire_detection/dl/models/01_test/05_fcn_stage2_window_21_smps_400_5_classes_3.pth', dls_fname='dls', model_fname='model', learner_fname='learner')
-learn.save_all(path='P:/workspace/jan/fire_detection/dl/models/01_test/06_ResNetPlus_window_21_smps_400_5_classes_2.pth', dls_fname='dls', model_fname='model', learner_fname='learner')
+#learn.save_all(path='P:/workspace/jan/fire_detection/dl/models_store/01_test/05_fcn_stage2_window_21_smps_400_5_classes_3.pth', dls_fname='dls', model_fname='model', learner_fname='learner')
+learn.save_all(path='P:/workspace/jan/fire_detection/dl/models_store/04_FCNN/06_ResNetPlus_window_21_smps_400_5_classes_2.pth', dls_fname='dls', model_fname='model', learner_fname='learner')
 
 ##
 #
-learn = load_learner_all(path='P:/workspace/jan/fire_detection/dl/models/01_test/06_ResNetPlus_window_21_smps_400_5_classes_2.pth',
+learn = load_learner_all(path='P:/workspace/jan/fire_detection/dl/models_store/01_test/06_ResNetPlus_window_21_smps_400_5_classes_2.pth',
                          dls_fname='dls', model_fname='model', learner_fname='learner')
 #dls = learn.dls
 
@@ -104,13 +106,13 @@ valid_dl = dls.valid
 #dls = TSDataLoaders.from_dsets(dsets.train, dsets.valid, bs=[40], batch_tfms=[TSStandardize()], num_workers=0)
 #learn.dls = dls
 #learn.show_results()
-#plt.savefig('P:/workspace/jan/fire_detection/dl/models/01_test/03_fcn_stage_2_results_test.png')
+#plt.savefig('P:/workspace/jan/fire_detection/dl/models_store/01_test/03_fcn_stage_2_results_test.png')
 
 ## show probabilities
 #dls = TSDataLoaders.from_dsets(dsets.train, dsets.valid, bs=[40], batch_tfms=[TSStandardize()], num_workers=0)
 #learn.dls = dls
 #learn.show_probas()
-#plt.savefig('P:/workspace/jan/fire_detection/dl/models/01_test/03_fcn_stage_2_probas_test.png')
+#plt.savefig('P:/workspace/jan/fire_detection/dl/models_store/01_test/03_fcn_stage_2_probas_test.png')
 
 #interp = ClassificationInterpretation.from_learner(learn)
 
@@ -177,7 +179,7 @@ X_ts.dtypes
 #import pathlib
 #plt = platform.system()
 #if plt == 'Windows': pathlib.PosixPath = pathlib.WindowsPath
-learn = load_learner_all(path='P:/workspace/jan/fire_detection/dl/models/01_test/06_ResNetPlus_window_21_smps_400_5_classes_2.pth',
+learn = load_learner_all(path='P:/workspace/jan/fire_detection/dl/models_store/01_test/06_ResNetPlus_window_21_smps_400_5_classes_2.pth',
                          dls_fname='dls', model_fname='model', learner_fname='learner')
 #dls = learn.dls
 

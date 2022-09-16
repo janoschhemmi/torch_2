@@ -9,7 +9,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch.quantization import QuantStub, DeQuantStub
 from torch.utils.data import Dataset, DataLoader
-import torchvision
+#import torchvision
 import pytorch_lightning as pl
 
 #import seaborn as sns
@@ -27,12 +27,13 @@ from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 
+from multiprocessing import Pool
 from multiprocessing import cpu_count
 
 ## load model
 import Unet
-from Unet import UNET
-from Unet import
+# import TSDataModule
+
 
  ## SETTINGS
 # %matplotlib inline
@@ -107,10 +108,10 @@ la
 
 ## TEST
 tt = sequences[0]
-tt = tt[0][["NBR","NDV"]]
+tt = tt[0][["NBR","NDV","BLU","GRN"]]
 tt = torch.Tensor(tt.to_numpy())
-tt = torch.transpose(tt, 0 , 1)
-tt = tt[None,:,: ]
+ttt = torch.transpose(tt, 0 , 1)
+ttt = ttt[None,:,: ]
 c = nn.Conv1d(in_channels = 2, out_channels = 6, stride = 1, kernel_size=(1))
 zz = c(tt)
 tt = tt[None,None,:,: ]
@@ -120,3 +121,13 @@ c = nn.Conv2d(in_channels = 2, out_channels = 6, stride = 1, kernel_size=1)
 
 m = nn.MaxPool1d( kernel_size = 2, stride=2)
 uu = m(zz)
+
+## CNN try
+c = nn.Conv1d(in_bands, in_bands * 2,stride = 1 ,kernel_size=1, padding=0)
+c = nn.Conv1d(4, 8,stride = 1 ,kernel_size=1, padding=0)
+cc = c(ttt)
+cc
+
+c_time = nn.Conv1d(8, 16, stride=1, kernel_size=5, padding=2)
+cc_2 = c_time(cc)
+

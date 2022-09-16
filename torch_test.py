@@ -96,10 +96,10 @@ learner = Learner(dls, model_test, metrics=accuracy)
 
 ## train
 #learn.fit_one_cycle(25, lr_max=1e-4)
-#learner.export("P:/workspace/jan/fire_detection/dl/models/01_test/01_fcn.pth")
+#learner.export("P:/workspace/jan/fire_detection/dl/models_store/01_test/01_fcn.pth")
 
 ## load safed model
-learner = load_learner("P:/workspace/jan/fire_detection/dl/models/01_test/01_fcn.pth")
+learner = load_learner("P:/workspace/jan/fire_detection/dl/models_store/01_test/01_fcn.pth")
 
 ## one batch
 x_one,y_one = dls.one_batch()
