@@ -79,11 +79,11 @@ for id, group in X_train.groupby("id"):
 sequences[0]
 
 ## split in training and test sequences
-train_sequences, valid_sequences = train_test_split(sequences, test_size=0.1)
-train_sequences, test_sequences = train_test_split(train_sequences, test_size=0.2)
+#train_sequences, valid_sequences = train_test_split(sequences, test_size=0.1)
+train_sequences, test_sequences = train_test_split(sequences, test_size=0.2)
 print("Number of Training Sequences: ", len(train_sequences))
 print("Number of Testing Sequences: ", len(test_sequences))
-print("Number of Valid Sequences: ", len(valid_sequences))
+#print("Number of Valid Sequences: ", len(valid_sequences))
 
 
 

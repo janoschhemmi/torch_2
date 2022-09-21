@@ -5,7 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/Unet" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/timesynctools" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.9 (torch) (2)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.10 (torch) (3)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

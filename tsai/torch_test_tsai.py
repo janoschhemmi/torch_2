@@ -72,6 +72,7 @@ class FCNN(Module):
         x = self.convblock3(x)
         x = self.gap(x)
         return self.fc(x)
+
 model = FCNN(dls.vars, dls.c)
 model
 #learn = Learner(dls, model, metrics=accuracy)
@@ -156,7 +157,7 @@ from sklearn.metrics import confusion_matrix
 #    X_ts = pd.read_csv(f, delimiter=';')
 
 ## load time series
-with open(r'P:\workspace\jan\fire_detection\dl\prepocessed_ref_tables\03_df_x_200000_ts_long.csv', 'r') as f:
+with open(r'P:\workspace\jan\fire_detection\dl\prepocessed_ref_tables\04_df_x_800000_ts_long.csv', 'r') as f:
     X_ts = pd.read_csv(f, delimiter=';',
                        dtype={
                            'x' :   'int64',

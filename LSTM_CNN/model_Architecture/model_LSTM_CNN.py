@@ -1,41 +1,70 @@
 
+## Model Architecture
+
+import torch
+import torch.nn as nn
+
 class LSTM_CNN (nn.Module):
-    def __init__(self, in_bands, time_steps ,n_classes ):
+    def __init__(self, in_bands, n_classes,
+                 Conv1_bands_NF = 8, Conv2_time_NF = 128, Conv3_time_NF = 256,
+                 Conv4_time_NF = 64):
+
         super(LSTM_CNN, self).__init__()
         self.in_bands = in_bands
-        self.time_steps = time_steps
-        self.classes = n_classes
+        self.n_classes = n_classes
+        self.Conv1_bands_NF = Conv1_bands_NF
+        self.Conv2_time_NF  = Conv2_time_NF
+        self.Conv3_time_NF  = Conv3_time_NF
+        self.Conv4_time_NF  = Conv4_time_NF
 
+        ## CONV
         ## gives 2 times in bands and same n timesteps
-        self.conv1_bands = nn.Conv1d(in_bands, in_bands * 2,stride = 1 ,kernel_size=1, padding=0)
+        self.conv1_bands = nn.Conv1d(in_bands, Conv1_bands_NF,stride = 1 ,kernel_size=1, padding=0)
+
         ## keeps 2 times in bands same time sequence size
-        self.conv2_time = nn.Conv1d(in_bands * 2, in_bands * 2, stride=1, kernel_size=5, padding=2)
+        self.conv2_time = nn.Conv1d(Conv1_bands_NF, Conv2_time_NF, stride=1, kernel_size=5, padding=2)
+        ## COnv 3 128 --> 256
+        self.conv3_time = nn.Conv1d(Conv2_time_NF, Conv3_time_NF, stride = 1, kernel_size = 7, padding = 3)
+        ## COnv 4 256 --> 64
+        self.conv4_time = nn.Conv1d(Conv3_time_NF, Conv4_time_NF, stride = 1, kernel_size = 3 , padding = 1)
+
+        ## batchnorm
+        self.bn_2 = nn.BatchNorm1d(Conv2_time_NF)
+        self.bn_3 = nn.BatchNorm1d(Conv3_time_NF)
+
         ## relu
         self.relu = nn.ReLU()
-        ## batchnorm
-        self.bn = nn.BatchNorm1d(out_layer)
 
-        ## 2 COnvs
-        self.convblock3 = ConvBlock(in_bands * 2, 128, 7)
-        self.convblock4 = ConvBlock(128, 256, 5)
-        self.convblock5 = ConvBlock(256, 64, 3)
+        ## Each convolutional layer is succeeded by batch normalization,
+        # with a momentum of 0.99 and epsilon of 0.001.
 
-        self.maxpool = MaxPool2d( (3,2), stride = 1)
-        self.fc = nn.Linear(layers[-1], c_out)
+        ## Self out layer
+        self.FC = nn.Linear(Conv4_time_NF, self.n_classes)
 
-
-
-
-
+        ##  output layer fc LSTM
+        #self.FC = nn.Linear(self.Conv3_NF + self.N_LSTM_Out, self.NumClassesOut)
 
 
 
     def forward(self, x):
 
         x = self.conv1_bands(x)
-        x = self.conv1_time(x)
-        x = self.bn(x)
-        x = self.relu(x)
+        print('Conv1 Band Shape: {}'.format(x.shape))
+        x = self.conv2_time(x)
+        print('Conv2 Time Shape: {}'.format(x.shape))
 
-        return out_out
+
+        x = self.conv3_time(x)
+        x = self.bn_2(x)
+        x = self.relu(x)
+        print('Conv3 Time Shape: {}'.format(x.shape))
+
+        x = self.conv4_time(x)
+        x = self.bn_3(x)
+        x = self.relu(x)
+        print('Conv4 Time Shape: {}'.format(x.shape))
+
+        out = self.FC(x)
+
+        return out
 
